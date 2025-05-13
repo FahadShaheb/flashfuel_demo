@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "54635122695",
+    "project_id": "flashfuel-c42f7",
+    "storage_bucket": "flashfuel-c42f7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:54635122695:android:4412b83e2c65348d0cdaa2",
+        "android_client_info": {
+          "package_name": "com.team7.flashfuel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjYImGwAslYRTpNVRr4nscn1c_Qq8ktCw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
