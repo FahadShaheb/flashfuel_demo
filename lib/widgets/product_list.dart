@@ -1,36 +1,56 @@
-import 'package:flash_fuel/models/product.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+class ProductList extends StatefulWidget {
+  const ProductList({super.key});
+
+  @override
+  _ProductListState createState() => _ProductListState();
+}
+
+class _ProductListState extends State<ProductList> {
+  final DatabaseReference _productsRef = FirebaseDatabase.instance.ref(
+    'product/products',
+  );
+  List<String> categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _listenToCategories();
+  }
+
+  void _listenToCategories() {
+    _productsRef.onValue.listen((event) {
+      final data = event.snapshot.value as Map?;
+      if (data != null) {
+        final Set<String> uniqueCategories = {};
+        data.forEach((key, value) {
+          final category = value['category'];
+          if (category != null) {
+            uniqueCategories.add(category.toString());
+          }
+        });
+        setState(() {
+          categories = uniqueCategories.toList();
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Flash Fuel')),
-      body: FutureBuilder<List<Product>>(
-        future: getProducts(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No products available.'));
-          }
-
-          List<Product> products = snapshot.data!;
-          return ListView.builder(
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(products[index].name),
-                subtitle: Text('Price: \$${products[index].price}'),
-              );
-            },
-          );
-        },
-      ),
+      appBar: AppBar(title: Text("Product Categories")),
+      body:
+          categories.isEmpty
+              ? Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                itemCount: categories.length,
+                itemBuilder: (context, index) {
+                  return ListTile(title: Text(categories[index]));
+                },
+              ),
     );
   }
 }
-
-getProducts() {}

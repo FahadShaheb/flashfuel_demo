@@ -1,51 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  SignupScreenState createState() => SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _vehicleTypeController = TextEditingController();
-  final _vehicleModelController = TextEditingController();
-  final _plateNumberController = TextEditingController();
-  bool _loading = false;
-  String _error = '';
+class SignupScreenState extends State<SignupScreen> {
+  final _auth = FirebaseAuth.instance;
+  final _formKey = GlobalKey<FormState>();
+  String _email = '';
+  String _password = '';
+  bool _isLoading = false;
 
-  Future<void> _signup() async {
+  void _signup() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    _formKey.currentState!.save();
     setState(() {
-      _loading = true;
-      _error = '';
+      _isLoading = true;
     });
+
     try {
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      await _auth.createUserWithEmailAndPassword(
+        email: _email,
+        password: _password,
       );
-
-      final uid = userCredential.user!.uid;
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'email': _emailController.text.trim(),
-        'vehicleType': _vehicleTypeController.text.trim(),
-        'vehicleModel': _vehicleModelController.text.trim(),
-        'plateNumber': _plateNumberController.text.trim(),
-      });
-
-      // Navigate to home or login
-      Navigator.pushReplacementNamed(context, '/login');
-    } catch (e) {
-      setState(() {
-        _error = 'Signup failed. Please try again.';
-      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Signup successful!')));
+      Navigator.of(context).pop(); // Navigate back or to another screen
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
     } finally {
       setState(() {
-        _loading = false;
+        _isLoading = false;
       });
     }
   }
@@ -53,23 +46,43 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign Up')),
+      appBar: AppBar(title: Text('Signup')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
           child: Column(
             children: [
-              TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Email')),
-              TextField(controller: _passwordController, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
-              TextField(controller: _vehicleTypeController, decoration: const InputDecoration(labelText: 'Vehicle Type')),
-              TextField(controller: _vehicleModelController, decoration: const InputDecoration(labelText: 'Vehicle Model')),
-              TextField(controller: _plateNumberController, decoration: const InputDecoration(labelText: 'Plate Number')),
-              if (_error.isNotEmpty) Text(_error, style: const TextStyle(color: Colors.red)),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _loading ? null : _signup,
-                child: _loading ? const CircularProgressIndicator() : const Text('Sign Up'),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Email'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.isEmpty || !value.contains('@')) {
+                    return 'Please enter a valid email';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _email = value!;
+                },
               ),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty || value.length < 6) {
+                    return 'Password must be at least 6 characters long';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _password = value!;
+                },
+              ),
+              SizedBox(height: 20),
+              _isLoading
+                  ? CircularProgressIndicator()
+                  : ElevatedButton(onPressed: _signup, child: Text('Signup')),
             ],
           ),
         ),

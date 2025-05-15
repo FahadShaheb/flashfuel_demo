@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "54635122695",
-    "project_id": "flashfuel-c42f7",
-    "storage_bucket": "flashfuel-c42f7.firebasestorage.app"
+    "project_number": "436882447188",
+    "project_id": "flashfuel-2c9c2",
+    "storage_bucket": "flashfuel-2c9c2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:54635122695:android:4412b83e2c65348d0cdaa2",
+        "mobilesdk_app_id": "1:436882447188:android:23c7685b3a033ba2ad06c1",
         "android_client_info": {
-          "package_name": "com.team7.flashfuel"
+          "package_name": "com.example.demo_flash_fuel"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBjYImGwAslYRTpNVRr4nscn1c_Qq8ktCw"
+          "current_key": "AIzaSyA2PeWY9eggnj6PedWT5Y3efpXYe9FjsKs"
         }
       ],
       "services": {
