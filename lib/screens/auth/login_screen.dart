@@ -36,11 +36,7 @@ class LoginScreenState extends State<LoginScreen> {
           context,
         ).showSnackBar(SnackBar(content: Text('Login successful')));
         // Navigate to the next screen
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => ProductList(), // Adjust this route
-          ),
-        );
+        Navigator.pushReplacementNamed(context, '/product_list');
       }
 
       // Adjust the route as needed
